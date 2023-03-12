@@ -3,11 +3,23 @@
 
 #define getCurved(x, a) (x/(x+(1-1/a)*(x-1))) // 0.5 = straight, < 0.5 = slow start, fast end, > 0.5 = fast start, slow end
 
+// Pin connected to ST_CP of 74HC595
+#define SD_LATCH_PIN  3
+// Pin connected to SH_CP of 74HC595
+#define SD_CLOCK_PIN  4
+// Pin connected to DS of 74HC595
+#define SD_DATA_PIN 2
+
+#define S_CLK 9
+#define S_RWS 8
+#define S_CS  7
+
 #define MAX_LFO_FREQUENCY 10.0
 #define MAX_ATTACK_TIME 5000.0
 #define MAX_DECAY_TIME 5000.0
 #define MAX_RELEASE_TIME 5000.0
 #define MAX_PW_SWING 2048.0
+#define MAX_PITCH_SWING 2.0;
 
 #define MODULATION_INTERRUPT_ENABLED  false
 #define MODULATION_SAMPLERATE  100.0  // leave at 100 for interrupt enabled
@@ -19,7 +31,7 @@
 #define MIDI_CHANNEL_FILTER 1
 #define MIDI_CHANNEL_FILTER_GATE 1
 
-#define CC_VOICE_TYPE 7 // on MIDI Channel 1 --- 1 = single voice, 2 = two voices / oscillators 3 = thtree voices / oscillators
+#define CC_VOICE_COUNT 7 // on MIDI Channel 1 --- 1 = single voice, 2 = two voices / oscillators 3 = three voices / oscillators
 #define CC_VOICE_PITCH_OFFSET 8
 
 #define CC_AMP_ATTACK 9
@@ -66,7 +78,8 @@
 #define CC_PW_ADSR_RELEASE 42
 #define CC_PW_ADSR_ENV 43
 
-#define CC_VOICE_TYPE_2 44 // 0 = MONO 1 = MONO LEGATO 2 = ARP
+#define CC_VOICE_TYPE 44 // 0 = MONO 1 = MONO LEGATO 2 = ARP
+#define CC_PORTAMENTO 88
 
 #define CC_TABLE_ENABLED 45 // Always disabled if ARP enabled
 

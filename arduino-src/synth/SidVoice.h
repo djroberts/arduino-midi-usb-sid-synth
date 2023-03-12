@@ -1,6 +1,7 @@
 #ifndef SidVoice_h
 #define SidVoice_h
 
+#include "ByteArray.h"
 #include "Sid.h"
 #include "LFO.h"
 #include "ADSR.h"
@@ -19,7 +20,6 @@
 #define MODE_VOL 0b11000
 
 class SidVoice {
-
   private:
     Sid *sid;
     LFO *lfoPitch;
@@ -34,8 +34,14 @@ class SidVoice {
 
     byte voice = 0; // 0 = all
 
+    byte voiceType = 1;
+
+    double portamentoCoeff = 0;
+
+    ByteArray notesOn;
+
     byte attack = 0;
-    byte decay = 10;
+    byte decay = 12;
     byte sustain = 12;
     byte release = 0;
 
@@ -44,15 +50,18 @@ class SidVoice {
     byte lowByte = 0;
     byte highByte = 0;
 
-    double currentVoltage = 0;
+    double currentVoltage = -1;
+    double targetVoltage = 0;
+    double octave = 0;
+    double fine = 0;
 
     byte lastFreqHighByte = 0;
     byte lastPWHighByte = 0;
 
     bool noise = false;
-    bool saw = false;
+    bool saw = true;
     bool pulse = false;
-    bool triangle = true;
+    bool triangle = false;
 
     double midiFrequencyTable[127];
 
@@ -149,7 +158,8 @@ class SidVoice {
       sendAttackDecay();
       sendSustainRelease();
 
-      noteOff();
+      // todo: becomes gate off
+      //noteOff();
 
       this->sid->set(MODE_VOL, 0b00001111);
     };
@@ -202,6 +212,14 @@ class SidVoice {
       this->triangle = triangle;
     }
 
+    void setOctave(double octave) {
+      this->octave = max(-2.0, min(2.0, octave));
+    }
+
+    void setFine(double fine) {
+      this->fine = (1.0 / 12.0) * max(-1.0, min(1.0, fine));
+    }
+
     void setPulseWidth(unsigned int pulseWidth) {
       this->pulseWidth = pulseWidth;
 
@@ -210,10 +228,48 @@ class SidVoice {
     }
 
     void changeFrequency(double voltage) {
-      double frequency =  440.0 * pow(2, (voltage + currentVoltage) - 5.0);
+      double frequency =  440.0 * pow(2, (voltage + currentVoltage + octave + fine) - 5.0);
 
       setFrequencyBytes(frequency);
       setFrequency();
+    }
+
+    void handleNoteOn(byte midiNote) {
+      if (!notesOn.exists(midiNote)) {
+        notesOn.push(midiNote);
+      }
+
+      if (notesOn.length() == 1 || voiceType == 0) {
+        noteOn(midiNote);
+      } else if (notesOn.length() > 1) {
+        targetVoltage = 5.0 + ((midiNote - 69.0) / 12.0);
+
+        if (portamentoCoeff == 0 || currentVoltage == -1) {
+          currentVoltage = targetVoltage;
+          changeFrequency(0);
+        }
+      }
+    }
+
+    void handleNoteOff(byte midiNote) {
+      notesOn.remove(midiNote);
+
+      if (notesOn.length() == 0) {
+        noteOff();
+      } else {
+        byte lastMidiNote = notesOn.getLast();
+
+        if (voiceType == 0) {
+          noteOn(lastMidiNote);
+        } else {
+          targetVoltage = 5.0 + ((lastMidiNote - 69.0) / 12.0);
+
+          if (portamentoCoeff == 0) {
+            currentVoltage = targetVoltage;
+            changeFrequency(0);
+          }
+        }
+      }
     }
 
     void noteOn(byte midiNote) {
@@ -222,15 +278,21 @@ class SidVoice {
       adsrPitch->reset();
       adsrPW->reset();
 
-      currentVoltage = 5.0 + ((midiNote - 69.0) / 12.0);
+      targetVoltage = 5.0 + ((midiNote - 69.0) / 12.0);
 
-      setFrequencyBytes(midiFrequencyTable[midiNote]);
+      if (voiceType == 1 || portamentoCoeff == 0 || currentVoltage == -1) {
+        currentVoltage = targetVoltage;
+        changeFrequency(0);
+      }
+
+      double frequency =  440.0 * pow(2, (currentVoltage + octave + fine) - 5.0);
+
+      setFrequencyBytes(frequency);
       setFrequency();
 
       //this->sid->set(MODE_VOL, 0b00001111);
 
       if (voice == 0 || voice == 1) {
-        Serial.println(getControlReg(), BIN);
         this->sid->set(VOICE_1_CONTROL_REG, getControlReg() + 1);
       }
     }
@@ -263,9 +325,13 @@ class SidVoice {
       double pitchModulation = 0;
       double pwModulation = 0;
 
+      double coeff = 0.95;
+
+      currentVoltage = targetVoltage + portamentoCoeff * (currentVoltage - targetVoltage);
+
       if (lfoPitchMultiplier != 0) {
         lfoPitch->process();
-        pitchModulation = lfoPitchMultiplier * lfoPitch->getOutput();
+        pitchModulation = lfoPitchMultiplier * lfoPitch->getOutput() * MAX_PITCH_SWING;
       }
 
       if (lfoPWMultiplier != 0) {
@@ -277,7 +343,7 @@ class SidVoice {
       if (adsrPitchMultiplier != 0) {
         adsrPitch->process();
 
-        pitchModulation += adsrPitchMultiplier * adsrPitch->getOutput();
+        pitchModulation += adsrPitchMultiplier * adsrPitch->getOutput() * MAX_PITCH_SWING;
       }
 
       if (adsrPWMultiplier != 0) {
@@ -286,13 +352,24 @@ class SidVoice {
         pwModulation += adsrPWMultiplier * adsrPW->getOutput() * MAX_PW_SWING;
       }
 
-      if (pitchModulation != 0) {
+      if (pitchModulation != 0 || portamentoCoeff > 0) {
         changeFrequency(pitchModulation);
       }
 
       if (pwModulation != 0) {
         changePulseWidth(pwModulation);
       }
+    }
+
+    void setVoiceType(byte voiceType) {
+      this->voiceType = max(0, min(2, voiceType));
+    }
+
+    // todo: implement a samplerate dependent version: portamentoCoeff = 1 - exp(-2 * pi * portamentoTime / sampleRate)
+    void setPortamento(double portamento) {
+      double sanitized = max(0, min(1.0, portamento));
+
+      portamentoCoeff = getCurved(sanitized, 0.9);
     }
 };
 

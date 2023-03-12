@@ -1,7 +1,7 @@
 package com.goblin.utils;
 
 public class SidConstants {
-    public static final byte CC_VOICE_TYPE = 7; // on MIDI Channel 1 --- 1 = single voice, 2 = two voices / oscillators 3 = thtree voices / oscillators
+    public static final byte CC_VOICE_COUNT = 7; // on MIDI Channel 1 --- 1 = single voice, 2 = two voices / oscillators 3 = thtree voices / oscillators
     public static final byte CC_VOICE_PITCH_OFFSET = 8;
 
     public static final byte CC_AMP_ATTACK = 9;
@@ -47,4 +47,7 @@ public class SidConstants {
     public static final byte CC_PW_ADSR_SUSTAIN = 41;
     public static final byte CC_PW_ADSR_RELEASE = 42;
     public static final byte CC_PW_ADSR_ENV = 43;
+
+    public static final byte CC_VOICE_TYPE = 44;
+    public static final byte CC_PORTAMENTO = 88;
 }

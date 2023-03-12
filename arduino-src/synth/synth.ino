@@ -11,21 +11,10 @@
 
 double microPeriod = 1.0 / MODULATION_SAMPLERATE * 1000000.0;
 
-// Pin connected to ST_CP of 74HC595
-#define SD_LATCH_PIN  3
-// Pin connected to SH_CP of 74HC595
-#define SD_CLOCK_PIN  4
-// Pin connected to DS of 74HC595
-#define SD_DATA_PIN 2
-
-#define S_CLK 9
-#define S_RWS 8
-#define S_CS  7
-
-SidData *sidData; // = SidData(SD_LATCH_PIN, SD_CLOCK_PIN, SD_DATA_PIN, true);
-SidAddress *sidAddress; // = SidAddress(A3, A2, A1, A0, A10);
-Sid *sid; // = Sid(S_CS, S_RWS, &sidData, &sidAddress);
-SidVoice *voice; // = SidVoice(1, &sid);
+SidData *sidData;
+SidAddress *sidAddress;
+Sid *sid;
+SidVoice *voice;
 LFO *lfoPitch1;
 LFO *lfoPW1;
 
@@ -33,7 +22,6 @@ ADSR *adsrPitch1;
 ADSR *adsrPW1;
 
 MidiHandler *midiHandler;
-
 midiEventPacket_t rx;
 
 bool synthReady = false;
@@ -42,24 +30,9 @@ void setup() {
   Serial.begin(115200);
 
   lfoPitch1 = new LFO(MODULATION_SAMPLERATE);
-  lfoPitch1->setAttackTime(0.0);
-  lfoPitch1->setFrequency(4);
-
   lfoPW1 = new LFO(MODULATION_SAMPLERATE);
-  lfoPW1->setAttackTime(0.0);
-  lfoPW1->setFrequency(4);
-
   adsrPitch1 = new ADSR(MODULATION_SAMPLERATE);
-  adsrPitch1->setAttackTime(0);
-  adsrPitch1->setDecayTime(1000.0);
-  adsrPitch1->setReleaseTime(0);
-  adsrPitch1->setSustainLevel(1.0);
-
   adsrPW1 = new ADSR(MODULATION_SAMPLERATE);
-  adsrPW1->setAttackTime(0);
-  adsrPW1->setDecayTime(1000.0);
-  adsrPW1->setReleaseTime(0);
-  adsrPW1->setSustainLevel(1.0);
 
   sidData = new SidData(SD_LATCH_PIN);
   sidAddress = new SidAddress();
@@ -74,18 +47,10 @@ void setup() {
 
   interrupts();
 
-  delay(500);
+  delay(1500);
 
   voice->init();
 
-  voice->setLFOPitchMultiplier(0.01);
-  voice->setLFOPWMultiplier(0.2);
-  voice->setADSRPitchMultiplier(0);
-
-  voice->setAttack(0);
-  voice->setDecay(10);
-  voice->setSustain(10);
-  voice->setRelease(10);
 //   voice->setSaw(true);
 //   voice->setTriangle(false);
 //   voice->noteOn(69);
@@ -115,11 +80,13 @@ void loop() {
     }
   } while (rx.header != 0);
 
-  if (MODULATION_INTERRUPT_ENABLED || currentTime - lastTime < microPeriod) {
+  double difference = currentTime - lastTime;
+
+  if (MODULATION_INTERRUPT_ENABLED || difference < microPeriod) {
     return;
   }
 
-  lastTime = currentTime;
+  lastTime = currentTime + microPeriod - difference;
 
   voice->process();
 }

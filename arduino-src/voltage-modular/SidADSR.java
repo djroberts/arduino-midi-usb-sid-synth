@@ -33,7 +33,7 @@ public class SidADSR extends VoltageModule
 
 
       canBeBypassed = false;
-      SetSkin( "e87c003e1a2a40198cb4d18213d93047" );
+      SetSkin( "03de115a0485447c9c2375a7f5c153b4" );
    }
 
 void InitializeControls()
@@ -295,7 +295,7 @@ void InitializeControls()
       //[user-Initialize]   Add your own initialization code here
 
 
-      send();
+
       //[/user-Initialize]
    }
 
@@ -554,7 +554,16 @@ void InitializeControls()
    {
       //[user-ProcessSample]   Add your own process-sampling code here
 
+      if (sent) {
+         return;
+      }
 
+      long currentTime = System.currentTimeMillis();
+      
+      if (currentTime - startTime >= 2500) {
+         send();
+         sent = true;
+      }
 
       //[/user-ProcessSample]
    }
@@ -645,7 +654,7 @@ void InitializeControls()
    {
       //[user-SetStateInformation]   Add your own code here
 
-
+      send();
 
       //[/user-SetStateInformation]
    }
@@ -722,13 +731,13 @@ void InitializeControls()
       if (pitchENV.GetValue() != 0) {
          sendPitch();
       } else {
-         sendCCMessage(SidConstants.CC_PITCH_LFO_ENV, 63);
+         sendCCMessage(SidConstants.CC_PITCH_ADSR_ENV, 63);
       }
       
       if (pwENV.GetValue() != 0) {
          sendPW();
       } else {
-         sendCCMessage(SidConstants.CC_PW_LFO_ENV, 63);      
+         sendCCMessage(SidConstants.CC_PW_ADSR_ENV, 63);      
       }
    }
 
@@ -748,6 +757,9 @@ void InitializeControls()
       sendCCMessage(SidConstants.CC_PW_ADSR_RELEASE, (int)release.GetValue());
       sendCCMessage(SidConstants.CC_PW_ADSR_ENV, (int)(pwENV.GetValue() + 63.0));
    }
+
+   private long startTime = System.currentTimeMillis();
+   private boolean sent = false;
 
    //[/user-code-and-variables]
 }

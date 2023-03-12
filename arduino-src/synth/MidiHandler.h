@@ -39,17 +39,25 @@ class MidiHandler {
 
     void handleNoteOn(midiEventPacket_t rx) {
       if (rx.byte1 - 0x90 == 1 || rx.byte1 - 0x90 == 0) {
-        this->voice1->noteOn(rx.byte2);
+        this->voice1->handleNoteOn(rx.byte2);
       }
     }
 
     void handleNoteOff(midiEventPacket_t rx) {
       if (rx.byte1 - 0x80 == 1 || rx.byte1 - 0x80 == 0) {
-        this->voice1->noteOff();
+        this->voice1->handleNoteOff(rx.byte2);
       }
     }
 
     void handleControlChange(midiEventPacket_t rx) {
+      if (rx.byte2 == CC_VOICE_TYPE) {
+        handleVoiceType(rx);
+      }
+
+      if (rx.byte2 == CC_PORTAMENTO) {
+        handlePortamento(rx);
+      }
+
       if (rx.byte2 == CC_AMP_ATTACK) {
         handleAttack(rx);
       }
@@ -137,6 +145,55 @@ class MidiHandler {
       if (rx.byte2 == CC_PW_LFO_ENV) {
         handleLFOPWEnvelope(rx);
       }
+
+      if (rx.byte2 == CC_PITCH_ADSR_ATTACK) {
+        handleADSRPitchAttack(rx);
+      }
+
+      if (rx.byte2 == CC_PITCH_ADSR_DECAY) {
+        handleADSRPitchDecay(rx);
+      }
+
+      if (rx.byte2 == CC_PITCH_ADSR_SUSTAIN) {
+        handleADSRPitchSustain(rx);
+      }
+
+      if (rx.byte2 == CC_PITCH_ADSR_RELEASE) {
+        handleADSRPitchRelease(rx);
+      }
+
+      if (rx.byte2 == CC_PITCH_ADSR_ENV) {
+        handleADSRPitchEnvelope(rx);
+      }
+
+      if (rx.byte2 == CC_PW_ADSR_ATTACK) {
+        handleADSRPWAttack(rx);
+      }
+
+      if (rx.byte2 == CC_PW_ADSR_DECAY) {
+        handleADSRPWDecay(rx);
+      }
+
+      if (rx.byte2 == CC_PW_ADSR_SUSTAIN) {
+        handleADSRPWSustain(rx);
+      }
+
+      if (rx.byte2 == CC_PW_ADSR_RELEASE) {
+        handleADSRPWRelease(rx);
+      }
+
+      if (rx.byte2 == CC_PW_ADSR_ENV) {
+        handleADSRPWEnvelope(rx);
+      }
+
+      if (rx.byte2 == CC_OCTAVE) {
+        handleOctave(rx);
+      }
+
+      if (rx.byte2 == CC_FINE) {
+        handleFine(rx);
+      }
+
     }
 
     SidVoice *getVoice(byte byte1) {
@@ -189,14 +246,14 @@ class MidiHandler {
 
     ADSR *getADSRPitch(byte byte1) {
       if (byte1 % 10 == 1) {
-        return this->adsrPW1;
+        return this->adsrPitch1;
       }
 
       if (byte1 % 10 == 2) {
-        return this->adsrPW1;
+        return this->adsrPitch1;
       }
 
-        return this->adsrPW1;
+        return this->adsrPitch1;
     }
 
     void handleAttack(midiEventPacket_t rx) {
@@ -322,9 +379,78 @@ class MidiHandler {
 
     void handleADSRPitchDecay(midiEventPacket_t rx) {
       ADSR *adsr = getADSRPitch(rx.byte1);
-      adsr->setDecayTime((rx.byte3 / 127.0) * MAX_ATTACK_TIME);
+      adsr->setDecayTime((rx.byte3 / 127.0) * MAX_DECAY_TIME);
     }
 
+    void handleADSRPitchRelease(midiEventPacket_t rx) {
+      ADSR *adsr = getADSRPitch(rx.byte1);
+      adsr->setReleaseTime((rx.byte3 / 127.0) * MAX_RELEASE_TIME);
+    }
+
+    void handleADSRPitchSustain(midiEventPacket_t rx) {
+      ADSR *adsr = getADSRPitch(rx.byte1);
+      adsr->setSustainLevel((rx.byte3 / 127.0));
+    }
+
+    void handleADSRPitchEnvelope(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+
+      float value = (rx.byte3 - 63.0) / 63.0;
+
+      voice->setADSRPitchMultiplier(getCurved(value, 0.6));
+    }
+
+    void handleADSRPWAttack(midiEventPacket_t rx) {
+      ADSR *adsr = getADSRPW(rx.byte1);
+      adsr->setAttackTime((rx.byte3 / 127.0) * MAX_ATTACK_TIME);
+    }
+
+    void handleADSRPWDecay(midiEventPacket_t rx) {
+      ADSR *adsr = getADSRPW(rx.byte1);
+      adsr->setDecayTime((rx.byte3 / 127.0) * MAX_DECAY_TIME);
+    }
+
+    void handleADSRPWRelease(midiEventPacket_t rx) {
+      ADSR *adsr = getADSRPW(rx.byte1);
+      adsr->setReleaseTime((rx.byte3 / 127.0) * MAX_RELEASE_TIME);
+    }
+
+    void handleADSRPWSustain(midiEventPacket_t rx) {
+      ADSR *adsr = getADSRPW(rx.byte1);
+      adsr->setSustainLevel((rx.byte3 / 127.0));
+    }
+
+    void handleADSRPWEnvelope(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+
+      float value = (rx.byte3 - 63.0) / 63.0;
+
+      voice->setADSRPWMultiplier(getCurved(value, 0.6));
+    }
+
+    void handleOctave(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+
+      voice->setOctave(rx.byte3 - 2.0);
+    }
+
+    void handleFine(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+
+      float value = (rx.byte3 - 63.0) / 63.0;
+
+      voice->setFine(getCurved(value, 0.3));
+    }
+
+    void handlePortamento(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+      voice->setPortamento((rx.byte3 / 127.0));
+    }
+
+    void handleVoiceType(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+      voice->setVoiceType(rx.byte3);
+    }
 };
 
 #endif

@@ -18,7 +18,6 @@ class LFO {
     double attackCurve = 0.3;
 
     double attackAccumulator = 0;
-
     double output = 0;
 
     void updatePhase() {

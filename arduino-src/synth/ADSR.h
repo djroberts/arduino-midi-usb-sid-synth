@@ -19,7 +19,14 @@ class ADSR {
     double level = 0;
 
     handleAttack() {
-      level += 1 / (0.001 * attackTime * sampleRate);
+      if (attackTime == 0) {
+        state = 1;
+        level = 1;
+
+        return;
+      }
+
+      level += 1.0 / (0.001 * attackTime * sampleRate);
 
       if (level > 1.0) {
         level = 1.0;
@@ -29,6 +36,13 @@ class ADSR {
     }
 
     handleDecay() {
+      if (decayTime == 0) {
+        state = 2;
+        level = sustainLevel;
+
+        return;
+      }
+
       double target = 1.0 - sustainLevel;
 
       level -= target * (1 / (0.001 * decayTime * sampleRate));
@@ -40,6 +54,13 @@ class ADSR {
     }
 
     handleRelease() {
+      if (releaseTime == 0) {
+        state = 4;
+        level = 0;
+
+        return;
+      }
+
       // todo: this should not be sustainLevel, but storing the level at release time which may be higher
       level -= sustainLevel * (1 / (0.001 * releaseTime * sampleRate));
 

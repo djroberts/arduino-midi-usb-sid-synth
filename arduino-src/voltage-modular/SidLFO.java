@@ -32,7 +32,7 @@ public class SidLFO extends VoltageModule
 
 
       canBeBypassed = false;
-      SetSkin( "dc5ba606e0454f24a74fb6907887234f" );
+      SetSkin( "09e2ee366a7d450dbdc12bfdbb112181" );
    }
 
 void InitializeControls()
@@ -48,6 +48,28 @@ void InitializeControls()
       frequency.SetKnobParams( 215, 145 );
       frequency.DisplayValueInPercent( false );
       frequency.SetKnobAdjustsRing( true );
+
+      pwENV = new VoltageKnob( "pwENV", "pwENV", this, -63, 63, 0 );
+      AddComponent( pwENV );
+      pwENV.SetWantsMouseNotifications( false );
+      pwENV.SetPosition( 10, 153 );
+      pwENV.SetSize( 27, 27 );
+      pwENV.SetSkin( "Plastic White" );
+      pwENV.SetRange( -63, 63, 0, false, 127 );
+      pwENV.SetKnobParams( 215, 145 );
+      pwENV.DisplayValueInPercent( false );
+      pwENV.SetKnobAdjustsRing( true );
+
+      pitchENV = new VoltageKnob( "pitchENV", "pitchENV", this, -63, 63, 0 );
+      AddComponent( pitchENV );
+      pitchENV.SetWantsMouseNotifications( false );
+      pitchENV.SetPosition( 54, 151 );
+      pitchENV.SetSize( 27, 27 );
+      pitchENV.SetSkin( "Plastic White" );
+      pitchENV.SetRange( -63, 63, 0, false, 127 );
+      pitchENV.SetKnobParams( 215, 145 );
+      pitchENV.DisplayValueInPercent( false );
+      pitchENV.SetKnobAdjustsRing( true );
 
       attack = new VoltageKnob( "attack", "attack", this, 0.0, 127, 0 );
       AddComponent( attack );
@@ -202,55 +224,12 @@ void InitializeControls()
       textLabel6.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
       textLabel6.SetFont( "<Sans-Serif>", 14, true, false );
 
-      textLabel7 = new VoltageLabel( "textLabel7", "textLabel7", this, "Shape" );
-      AddComponent( textLabel7 );
-      textLabel7.SetWantsMouseNotifications( false );
-      textLabel7.SetPosition( 11, 234 );
-      textLabel7.SetSize( 72, 30 );
-      textLabel7.SetEditable( false, false );
-      textLabel7.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
-      textLabel7.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
-      textLabel7.SetColor( new Color( 255, 255, 255, 255 ) );
-      textLabel7.SetBkColor( new Color( 65, 65, 65, 0 ) );
-      textLabel7.SetBorderColor( new Color( 0, 0, 0, 0 ) );
-      textLabel7.SetBorderSize( 1 );
-      textLabel7.SetMultiLineEdit( false );
-      textLabel7.SetIsNumberEditor( false );
-      textLabel7.SetNumberEditorRange( 0, 100 );
-      textLabel7.SetNumberEditorInterval( 1 );
-      textLabel7.SetNumberEditorUsesMouseWheel( false );
-      textLabel7.SetHasCustomTextHoverColor( false );
-      textLabel7.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
-      textLabel7.SetFont( "<Sans-Serif>", 14, false, false );
-
       midiOut = new VoltageMidiJack( "midiOut", "midiOut", this, JackType.JackType_MidiOutput );
       AddComponent( midiOut );
       midiOut.SetWantsMouseNotifications( false );
       midiOut.SetPosition( 28, 305 );
       midiOut.SetSize( 37, 37 );
       midiOut.SetSkin( "Mini MIDI Jack" );
-
-      pwENV = new VoltageKnob( "pwENV", "pwENV", this, -63, 63, 0 );
-      AddComponent( pwENV );
-      pwENV.SetWantsMouseNotifications( false );
-      pwENV.SetPosition( 10, 153 );
-      pwENV.SetSize( 27, 27 );
-      pwENV.SetSkin( "Plastic White" );
-      pwENV.SetRange( -63, 63, 0, false, 127 );
-      pwENV.SetKnobParams( 215, 145 );
-      pwENV.DisplayValueInPercent( false );
-      pwENV.SetKnobAdjustsRing( true );
-
-      pitchENV = new VoltageKnob( "pitchENV", "pitchENV", this, -63, 63, 0 );
-      AddComponent( pitchENV );
-      pitchENV.SetWantsMouseNotifications( false );
-      pitchENV.SetPosition( 54, 151 );
-      pitchENV.SetSize( 27, 27 );
-      pitchENV.SetSkin( "Plastic White" );
-      pitchENV.SetRange( -63, 63, 0, false, 127 );
-      pitchENV.SetKnobParams( 215, 145 );
-      pitchENV.DisplayValueInPercent( false );
-      pitchENV.SetKnobAdjustsRing( true );
 }
 
 
@@ -266,7 +245,6 @@ void InitializeControls()
    {
       //[user-Initialize]   Add your own initialization code here
 
-      send();
 
 
       //[/user-Initialize]
@@ -526,7 +504,16 @@ void InitializeControls()
    {
       //[user-ProcessSample]   Add your own process-sampling code here
 
+      if (sent) {
+         return;
+      }
 
+      long currentTime = System.currentTimeMillis();
+      
+      if (currentTime - startTime >= 2500) {
+         send();
+         sent = true;
+      }
 
       //[/user-ProcessSample]
    }
@@ -617,7 +604,7 @@ void InitializeControls()
    {
       //[user-SetStateInformation]   Add your own code here
 
-
+      send();
 
       //[/user-SetStateInformation]
    }
@@ -661,10 +648,7 @@ void InitializeControls()
 
 
    // Auto-generated variables
-   private VoltageKnob pitchENV;
-   private VoltageKnob pwENV;
    private VoltageMidiJack midiOut;
-   private VoltageLabel textLabel7;
    private VoltageLabel textLabel6;
    private VoltageLabel textLabel5;
    private VoltageLabel textLabel4;
@@ -674,6 +658,8 @@ void InitializeControls()
    private VoltageToggle free;
    private VoltageSwitch shape;
    private VoltageKnob attack;
+   private VoltageKnob pitchENV;
+   private VoltageKnob pwENV;
    private VoltageKnob frequency;
 
 
@@ -717,6 +703,9 @@ void InitializeControls()
       sendCCMessage(SidConstants.CC_PW_LFO_SHAPE, (int)shape.GetValue());
       sendCCMessage(SidConstants.CC_PW_LFO_ENV, (int)(pwENV.GetValue() + 63.0));   
    }
+
+   private long startTime = System.currentTimeMillis();
+   private boolean sent = false;
 
    //[/user-code-and-variables]
 }

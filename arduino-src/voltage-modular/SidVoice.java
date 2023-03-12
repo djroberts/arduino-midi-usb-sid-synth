@@ -26,13 +26,13 @@ public class SidVoice extends VoltageModule
 
    public SidVoice( long moduleID, VoltageObjects voltageObjects )
    {
-      super( moduleID, voltageObjects, "SidVoice", ModuleType.ModuleType_Utility, 8.2 );
+      super( moduleID, voltageObjects, "SidVoice", ModuleType.ModuleType_Utility, 2.8 );
 
       InitializeControls();
 
 
       canBeBypassed = false;
-      SetSkin( "1582892bd74044948e8989576a23d04f" );
+      SetSkin( "19a0cb58facb440792d193a7dbcf1e33" );
    }
 
 void InitializeControls()
@@ -41,7 +41,7 @@ void InitializeControls()
       attack = new VoltageSlider( "attack", "Attack", this, true, 0.0, 15, 0.5, 16 );
       AddComponent( attack );
       attack.SetWantsMouseNotifications( false );
-      attack.SetPosition( 427, 12 );
+      attack.SetPosition( 81, 13 );
       attack.SetSize( 10, 91 );
       attack.SetSkin( "Straight Black Plain" );
       attack.DisplayValueInPercent( false );
@@ -49,7 +49,7 @@ void InitializeControls()
       decay = new VoltageSlider( "decay", "Decay", this, true, 0.0, 15, 0.5, 16 );
       AddComponent( decay );
       decay.SetWantsMouseNotifications( false );
-      decay.SetPosition( 453, 11 );
+      decay.SetPosition( 107, 12 );
       decay.SetSize( 10, 91 );
       decay.SetSkin( "Straight Black Plain" );
       decay.DisplayValueInPercent( false );
@@ -57,7 +57,7 @@ void InitializeControls()
       sustain = new VoltageSlider( "sustain", "Sustain", this, true, 0.0, 15, 0.5, 16 );
       AddComponent( sustain );
       sustain.SetWantsMouseNotifications( false );
-      sustain.SetPosition( 477, 13 );
+      sustain.SetPosition( 131, 14 );
       sustain.SetSize( 10, 91 );
       sustain.SetSkin( "Straight Black Plain" );
       sustain.DisplayValueInPercent( false );
@@ -65,7 +65,7 @@ void InitializeControls()
       release = new VoltageSlider( "release", "Release", this, true, 0.0, 15, 0.5, 16 );
       AddComponent( release );
       release.SetWantsMouseNotifications( false );
-      release.SetPosition( 503, 12 );
+      release.SetPosition( 157, 13 );
       release.SetSize( 10, 91 );
       release.SetSkin( "Straight Black Plain" );
       release.DisplayValueInPercent( false );
@@ -73,14 +73,14 @@ void InitializeControls()
       midiOut = new VoltageMidiJack( "midiOut", "midiOut", this, JackType.JackType_MidiOutput );
       AddComponent( midiOut );
       midiOut.SetWantsMouseNotifications( false );
-      midiOut.SetPosition( 529, 311 );
+      midiOut.SetPosition( 19, 304 );
       midiOut.SetSize( 37, 37 );
       midiOut.SetSkin( "Mini MIDI Jack" );
 
       triangleButton = new VoltageToggle( "triangleButton", "Triangle", this, false, 0 );
       AddComponent( triangleButton );
       triangleButton.SetWantsMouseNotifications( false );
-      triangleButton.SetPosition( 29, 13 );
+      triangleButton.SetPosition( 18, 13 );
       triangleButton.SetSize( 39, 19 );
       triangleButton.SetSkin( "Short Green" );
       triangleButton.ShowOverlay( false );
@@ -89,7 +89,7 @@ void InitializeControls()
       sawButton = new VoltageToggle( "sawButton", "Saw", this, false, 0 );
       AddComponent( sawButton );
       sawButton.SetWantsMouseNotifications( false );
-      sawButton.SetPosition( 85, 10 );
+      sawButton.SetPosition( 15, 77 );
       sawButton.SetSize( 39, 19 );
       sawButton.SetSkin( "Short Green" );
       sawButton.ShowOverlay( false );
@@ -98,7 +98,7 @@ void InitializeControls()
       squareButton = new VoltageToggle( "squareButton", "Square", this, false, 0 );
       AddComponent( squareButton );
       squareButton.SetWantsMouseNotifications( false );
-      squareButton.SetPosition( 137, 13 );
+      squareButton.SetPosition( 19, 143 );
       squareButton.SetSize( 39, 19 );
       squareButton.SetSkin( "Short Green" );
       squareButton.ShowOverlay( false );
@@ -107,7 +107,7 @@ void InitializeControls()
       noiseButton = new VoltageToggle( "noiseButton", "Noise", this, false, 0 );
       AddComponent( noiseButton );
       noiseButton.SetWantsMouseNotifications( false );
-      noiseButton.SetPosition( 196, 14 );
+      noiseButton.SetPosition( 16, 206 );
       noiseButton.SetSize( 39, 19 );
       noiseButton.SetSkin( "Short Green" );
       noiseButton.ShowOverlay( false );
@@ -116,13 +116,242 @@ void InitializeControls()
       pulseWidth = new VoltageKnob( "pulseWidth", "pulseWidth", this, 0.0, 127, 64 );
       AddComponent( pulseWidth );
       pulseWidth.SetWantsMouseNotifications( false );
-      pulseWidth.SetPosition( 145, 44 );
+      pulseWidth.SetPosition( 66, 140 );
       pulseWidth.SetSize( 27, 27 );
       pulseWidth.SetSkin( "Plastic White" );
       pulseWidth.SetRange( 0.0, 127, 64, false, 128 );
       pulseWidth.SetKnobParams( 215, 145 );
       pulseWidth.DisplayValueInPercent( false );
       pulseWidth.SetKnobAdjustsRing( true );
+
+      textLabel1 = new VoltageLabel( "textLabel1", "textLabel1", this, "Tri" );
+      AddComponent( textLabel1 );
+      textLabel1.SetWantsMouseNotifications( false );
+      textLabel1.SetPosition( 0, 40 );
+      textLabel1.SetSize( 80, 30 );
+      textLabel1.SetEditable( false, false );
+      textLabel1.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel1.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel1.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel1.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel1.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel1.SetBorderSize( 1 );
+      textLabel1.SetMultiLineEdit( false );
+      textLabel1.SetIsNumberEditor( false );
+      textLabel1.SetNumberEditorRange( 0, 100 );
+      textLabel1.SetNumberEditorInterval( 1 );
+      textLabel1.SetNumberEditorUsesMouseWheel( false );
+      textLabel1.SetHasCustomTextHoverColor( false );
+      textLabel1.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel1.SetFont( "<Sans-Serif>", 14, false, false );
+
+      textLabel2 = new VoltageLabel( "textLabel2", "textLabel2", this, "Saw" );
+      AddComponent( textLabel2 );
+      textLabel2.SetWantsMouseNotifications( false );
+      textLabel2.SetPosition( 0, 107 );
+      textLabel2.SetSize( 80, 30 );
+      textLabel2.SetEditable( false, false );
+      textLabel2.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel2.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel2.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel2.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel2.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel2.SetBorderSize( 1 );
+      textLabel2.SetMultiLineEdit( false );
+      textLabel2.SetIsNumberEditor( false );
+      textLabel2.SetNumberEditorRange( 0, 100 );
+      textLabel2.SetNumberEditorInterval( 1 );
+      textLabel2.SetNumberEditorUsesMouseWheel( false );
+      textLabel2.SetHasCustomTextHoverColor( false );
+      textLabel2.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel2.SetFont( "<Sans-Serif>", 14, false, false );
+
+      textLabel3 = new VoltageLabel( "textLabel3", "textLabel3", this, "Pulse" );
+      AddComponent( textLabel3 );
+      textLabel3.SetWantsMouseNotifications( false );
+      textLabel3.SetPosition( 20, 163 );
+      textLabel3.SetSize( 80, 30 );
+      textLabel3.SetEditable( false, false );
+      textLabel3.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel3.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel3.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel3.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel3.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel3.SetBorderSize( 1 );
+      textLabel3.SetMultiLineEdit( false );
+      textLabel3.SetIsNumberEditor( false );
+      textLabel3.SetNumberEditorRange( 0, 100 );
+      textLabel3.SetNumberEditorInterval( 1 );
+      textLabel3.SetNumberEditorUsesMouseWheel( false );
+      textLabel3.SetHasCustomTextHoverColor( false );
+      textLabel3.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel3.SetFont( "<Sans-Serif>", 14, false, false );
+
+      textLabel5 = new VoltageLabel( "textLabel5", "textLabel5", this, "Octave" );
+      AddComponent( textLabel5 );
+      textLabel5.SetWantsMouseNotifications( false );
+      textLabel5.SetPosition( 82, 164 );
+      textLabel5.SetSize( 80, 30 );
+      textLabel5.SetEditable( false, false );
+      textLabel5.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel5.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel5.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel5.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel5.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel5.SetBorderSize( 1 );
+      textLabel5.SetMultiLineEdit( false );
+      textLabel5.SetIsNumberEditor( false );
+      textLabel5.SetNumberEditorRange( 0, 100 );
+      textLabel5.SetNumberEditorInterval( 1 );
+      textLabel5.SetNumberEditorUsesMouseWheel( false );
+      textLabel5.SetHasCustomTextHoverColor( false );
+      textLabel5.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel5.SetFont( "<Sans-Serif>", 14, false, false );
+
+      textLabel6 = new VoltageLabel( "textLabel6", "textLabel6", this, "Fine" );
+      AddComponent( textLabel6 );
+      textLabel6.SetWantsMouseNotifications( false );
+      textLabel6.SetPosition( 143, 166 );
+      textLabel6.SetSize( 53, 30 );
+      textLabel6.SetEditable( false, false );
+      textLabel6.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel6.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel6.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel6.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel6.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel6.SetBorderSize( 1 );
+      textLabel6.SetMultiLineEdit( false );
+      textLabel6.SetIsNumberEditor( false );
+      textLabel6.SetNumberEditorRange( 0, 100 );
+      textLabel6.SetNumberEditorInterval( 1 );
+      textLabel6.SetNumberEditorUsesMouseWheel( false );
+      textLabel6.SetHasCustomTextHoverColor( false );
+      textLabel6.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel6.SetFont( "<Sans-Serif>", 14, false, false );
+
+      textLabel4 = new VoltageLabel( "textLabel4", "textLabel4", this, "Noise" );
+      AddComponent( textLabel4 );
+      textLabel4.SetWantsMouseNotifications( false );
+      textLabel4.SetPosition( 0, 233 );
+      textLabel4.SetSize( 80, 30 );
+      textLabel4.SetEditable( false, false );
+      textLabel4.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel4.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel4.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel4.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel4.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel4.SetBorderSize( 1 );
+      textLabel4.SetMultiLineEdit( false );
+      textLabel4.SetIsNumberEditor( false );
+      textLabel4.SetNumberEditorRange( 0, 100 );
+      textLabel4.SetNumberEditorInterval( 1 );
+      textLabel4.SetNumberEditorUsesMouseWheel( false );
+      textLabel4.SetHasCustomTextHoverColor( false );
+      textLabel4.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel4.SetFont( "<Sans-Serif>", 14, false, false );
+
+      octave = new VoltageKnob( "octave", "octave", this, -2, 2, 0 );
+      AddComponent( octave );
+      octave.SetWantsMouseNotifications( false );
+      octave.SetPosition( 114, 137 );
+      octave.SetSize( 27, 27 );
+      octave.SetSkin( "Plastic White" );
+      octave.SetRange( -2, 2, 0, false, 5 );
+      octave.SetKnobParams( 215, 145 );
+      octave.DisplayValueInPercent( false );
+      octave.SetKnobAdjustsRing( true );
+
+      fine = new VoltageKnob( "fine", "fine", this, -63, 63, 0 );
+      AddComponent( fine );
+      fine.SetWantsMouseNotifications( false );
+      fine.SetPosition( 160, 135 );
+      fine.SetSize( 27, 27 );
+      fine.SetSkin( "Plastic White" );
+      fine.SetRange( -63, 63, 0, false, 127 );
+      fine.SetKnobParams( 215, 145 );
+      fine.DisplayValueInPercent( false );
+      fine.SetKnobAdjustsRing( true );
+
+      textLabel7 = new VoltageLabel( "textLabel7", "textLabel7", this, "Text" );
+      AddComponent( textLabel7 );
+      textLabel7.SetWantsMouseNotifications( false );
+      textLabel7.SetPosition( 108, 316 );
+      textLabel7.SetSize( 80, 30 );
+      textLabel7.SetEditable( false, false );
+      textLabel7.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel7.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel7.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel7.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel7.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel7.SetBorderSize( 1 );
+      textLabel7.SetMultiLineEdit( false );
+      textLabel7.SetIsNumberEditor( false );
+      textLabel7.SetNumberEditorRange( 0, 100 );
+      textLabel7.SetNumberEditorInterval( 1 );
+      textLabel7.SetNumberEditorUsesMouseWheel( false );
+      textLabel7.SetHasCustomTextHoverColor( false );
+      textLabel7.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel7.SetFont( "<Sans-Serif>", 14, false, false );
+
+      voiceType = new VoltageSwitch( "voiceType", "voiceType", this, 0 );
+      AddComponent( voiceType );
+      voiceType.SetWantsMouseNotifications( false );
+      voiceType.SetPosition( 85, 209 );
+      voiceType.SetSize( 39, 15 );
+      voiceType.SetSkin( "3-State Slide Horizontal" );
+
+      porta = new VoltageKnob( "porta", "porta", this, 0.0, 127, 0 );
+      AddComponent( porta );
+      porta.SetWantsMouseNotifications( false );
+      porta.SetPosition( 149, 205 );
+      porta.SetSize( 27, 27 );
+      porta.SetSkin( "Plastic White" );
+      porta.SetRange( 0.0, 127, 0, false, 128 );
+      porta.SetKnobParams( 215, 145 );
+      porta.DisplayValueInPercent( false );
+      porta.SetKnobAdjustsRing( true );
+
+      textLabel8 = new VoltageLabel( "textLabel8", "textLabel8", this, "Porta" );
+      AddComponent( textLabel8 );
+      textLabel8.SetWantsMouseNotifications( false );
+      textLabel8.SetPosition( 135, 237 );
+      textLabel8.SetSize( 53, 30 );
+      textLabel8.SetEditable( false, false );
+      textLabel8.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel8.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel8.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel8.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel8.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel8.SetBorderSize( 1 );
+      textLabel8.SetMultiLineEdit( false );
+      textLabel8.SetIsNumberEditor( false );
+      textLabel8.SetNumberEditorRange( 0, 100 );
+      textLabel8.SetNumberEditorInterval( 1 );
+      textLabel8.SetNumberEditorUsesMouseWheel( false );
+      textLabel8.SetHasCustomTextHoverColor( false );
+      textLabel8.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel8.SetFont( "<Sans-Serif>", 14, false, false );
+
+      textLabel9 = new VoltageLabel( "textLabel9", "textLabel9", this, "Type" );
+      AddComponent( textLabel9 );
+      textLabel9.SetWantsMouseNotifications( false );
+      textLabel9.SetPosition( 75, 235 );
+      textLabel9.SetSize( 53, 30 );
+      textLabel9.SetEditable( false, false );
+      textLabel9.SetJustificationFlags( VoltageLabel.Justification.HorizCentered );
+      textLabel9.SetJustificationFlags( VoltageLabel.Justification.VertCentered );
+      textLabel9.SetColor( new Color( 255, 255, 255, 255 ) );
+      textLabel9.SetBkColor( new Color( 65, 65, 65, 0 ) );
+      textLabel9.SetBorderColor( new Color( 0, 0, 0, 0 ) );
+      textLabel9.SetBorderSize( 1 );
+      textLabel9.SetMultiLineEdit( false );
+      textLabel9.SetIsNumberEditor( false );
+      textLabel9.SetNumberEditorRange( 0, 100 );
+      textLabel9.SetNumberEditorInterval( 1 );
+      textLabel9.SetNumberEditorUsesMouseWheel( false );
+      textLabel9.SetHasCustomTextHoverColor( false );
+      textLabel9.SetTextHoverColor( new Color( 0, 0, 0, 255 ) );
+      textLabel9.SetFont( "<Sans-Serif>", 14, false, false );
 }
 
 
@@ -178,30 +407,32 @@ void InitializeControls()
             if (component == pulseWidth) {
                sendShortPulseWidth();
             } else {
-               sendMidi();                     
+               send();                     
             }
          }
          break;
       
          case Slider_Changed:   // doubleValue is the new slider value
          {
-            sendMidi();
+            send();                     
          }
          break;
       
          case Button_Changed:   // doubleValue is the new button/toggle button value
          {
-            sendMidi();
+            send();                     
          }
          break;
       
          case Switch_Changed:   // doubleValue is the new switch value
          {
+            send();                     
          }
          break;
       
          case Jack_Connected:   // longValue is the new cable ID
          {
+            send();  
          }
          break;
       
@@ -294,7 +525,7 @@ void InitializeControls()
       
          case SoundPlayback_Start:   // A sound has begun playback
          {
-            sendMidi();
+            send();
 
          }
          break;
@@ -400,6 +631,18 @@ void InitializeControls()
    {
       //[user-ProcessSample]   Add your own process-sampling code here
 
+      if (sent) {
+         return;
+      }
+
+      long currentTime = System.currentTimeMillis();
+      
+      if (currentTime - startTime >= 2500) {
+         textLabel7.SetText("Sent");
+         
+         send();
+         sent = true;
+      }
 
 
       //[/user-ProcessSample]
@@ -530,11 +773,26 @@ void InitializeControls()
 
 
 
+      send();
+
       //[/user-SetStateInformationForVariations]
    }
 
 
    // Auto-generated variables
+   private VoltageLabel textLabel9;
+   private VoltageLabel textLabel8;
+   private VoltageKnob porta;
+   private VoltageSwitch voiceType;
+   private VoltageLabel textLabel7;
+   private VoltageKnob fine;
+   private VoltageKnob octave;
+   private VoltageLabel textLabel4;
+   private VoltageLabel textLabel6;
+   private VoltageLabel textLabel5;
+   private VoltageLabel textLabel3;
+   private VoltageLabel textLabel2;
+   private VoltageLabel textLabel1;
    private VoltageKnob pulseWidth;
    private VoltageToggle noiseButton;
    private VoltageToggle squareButton;
@@ -549,12 +807,16 @@ void InitializeControls()
 
    //[user-code-and-variables]    Add your own variables and functions here
    
-   private void sendShortPulseWidth() {
+  private void sendCCMessage(byte cc, int value) {
       try {
          ShortMessage m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_PW_SINGLE_BYTE, (int)pulseWidth.GetValue());
+         m.setMessage(ShortMessage.CONTROL_CHANGE, cc, value);
          midiOut.AddMessage(m);
       } catch (Exception e) {}
+   }
+   
+   private void sendShortPulseWidth() {
+      sendCCMessage(SidConstants.CC_PW_SINGLE_BYTE, (int)pulseWidth.GetValue());
    }
    
    private void sendPulseWidth()
@@ -569,61 +831,35 @@ void InitializeControls()
       // extract the high byte
       int highByte = (value >> 8) & 0xFF;
       
-      try {
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_PW_LO_BYTE, lowByte);
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_PW_HI_BYTE, highByte);
-         midiOut.AddMessage(m);
-      } catch (Exception e) {}
+      sendCCMessage(SidConstants.CC_PW_LO_BYTE, lowByte);
+      sendCCMessage(SidConstants.CC_PW_HI_BYTE, highByte);
    }
 
    private void sendADSR()
    {
-      try {      
-         ShortMessage m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_AMP_ATTACK, (int)attack.GetValue());
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_AMP_DECAY, (int)decay.GetValue());
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_AMP_SUSTAIN, (int)sustain.GetValue());
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_AMP_RELEASE, (int)release.GetValue());
-         midiOut.AddMessage(m);
-      } catch(Exception e) {}    
+      
+      sendCCMessage(SidConstants.CC_AMP_ATTACK, (int)attack.GetValue());
+      sendCCMessage(SidConstants.CC_AMP_DECAY, (int)decay.GetValue());
+      sendCCMessage(SidConstants.CC_AMP_SUSTAIN, (int)sustain.GetValue());
+      sendCCMessage(SidConstants.CC_AMP_RELEASE, (int)release.GetValue());
    }
 
    private void sendShapes()
    {
-      try {      
-         ShortMessage m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_TRIANGLE, (int)triangleButton.GetValue());
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_SAW, (int)sawButton.GetValue());
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_PULSE, (int)squareButton.GetValue());
-         midiOut.AddMessage(m);
-
-         m = new ShortMessage();
-         m.setMessage(ShortMessage.CONTROL_CHANGE, SidConstants.CC_NOISE, (int)noiseButton.GetValue());
-         midiOut.AddMessage(m);
-      } catch(Exception e) {}            
+      sendCCMessage(SidConstants.CC_VOICE_TYPE, (int)voiceType.GetValue());
+      sendCCMessage(SidConstants.CC_PORTAMENTO, (int)porta.GetValue());
+      sendCCMessage(SidConstants.CC_TRIANGLE, (int)triangleButton.GetValue());
+      sendCCMessage(SidConstants.CC_SAW, (int)sawButton.GetValue());
+      sendCCMessage(SidConstants.CC_PULSE, (int)squareButton.GetValue());
+      sendCCMessage(SidConstants.CC_NOISE, (int)noiseButton.GetValue());
+      sendCCMessage(SidConstants.CC_OCTAVE, (int)(octave.GetValue()+ 2.0));
+      sendCCMessage(SidConstants.CC_FINE, (int)(fine.GetValue() + 63.0));            
    }
 
+   long startTime = System.currentTimeMillis();
+   private boolean sent = false;
 
-   private void sendMidi()
+   private void send()
    {
       sendShapes();
       sendADSR();
