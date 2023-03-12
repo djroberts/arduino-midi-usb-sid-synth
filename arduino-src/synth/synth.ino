@@ -14,12 +14,24 @@ double microPeriod = 1.0 / MODULATION_SAMPLERATE * 1000000.0;
 SidData *sidData;
 SidAddress *sidAddress;
 Sid *sid;
-SidVoice *voice;
+
+SidVoice *voice1;
+SidVoice *voice2;
+SidVoice *voice3;
+
 LFO *lfoPitch1;
 LFO *lfoPW1;
+LFO *lfoPitch2;
+LFO *lfoPW2;
+LFO *lfoPitch3;
+LFO *lfoPW3;
 
 ADSR *adsrPitch1;
 ADSR *adsrPW1;
+ADSR *adsrPitch2;
+ADSR *adsrPW2;
+ADSR *adsrPitch3;
+ADSR *adsrPW3;
 
 MidiHandler *midiHandler;
 midiEventPacket_t rx;
@@ -31,15 +43,27 @@ void setup() {
 
   lfoPitch1 = new LFO(MODULATION_SAMPLERATE);
   lfoPW1 = new LFO(MODULATION_SAMPLERATE);
+  lfoPitch2 = new LFO(MODULATION_SAMPLERATE);
+  lfoPW2 = new LFO(MODULATION_SAMPLERATE);
+  lfoPitch3 = new LFO(MODULATION_SAMPLERATE);
+  lfoPW3 = new LFO(MODULATION_SAMPLERATE);
+
   adsrPitch1 = new ADSR(MODULATION_SAMPLERATE);
   adsrPW1 = new ADSR(MODULATION_SAMPLERATE);
+  adsrPitch2 = new ADSR(MODULATION_SAMPLERATE);
+  adsrPW2 = new ADSR(MODULATION_SAMPLERATE);
+  adsrPitch3 = new ADSR(MODULATION_SAMPLERATE);
+  adsrPW3 = new ADSR(MODULATION_SAMPLERATE);
 
   sidData = new SidData(SD_LATCH_PIN);
   sidAddress = new SidAddress();
   sid = new Sid(S_CS, S_RWS, sidData, sidAddress);
-  voice = new SidVoice(1, sid, lfoPitch1, adsrPitch1, lfoPW1, adsrPW1);
 
-  midiHandler = new MidiHandler(voice, lfoPitch1, lfoPW1, adsrPitch1, adsrPW1);
+  voice1 = new SidVoice(0, sid, lfoPitch1, adsrPitch1, lfoPW1, adsrPW1);
+  voice2 = new SidVoice(1, sid, lfoPitch2, adsrPitch2, lfoPW2, adsrPW2);
+  voice3 = new SidVoice(2, sid, lfoPitch3, adsrPitch3, lfoPW3, adsrPW3);
+
+  midiHandler = new MidiHandler(voice1, voice2, voice3, lfoPitch1, lfoPW1, lfoPitch2, lfoPW2, lfoPitch3, lfoPW3, adsrPitch1, adsrPW1, adsrPitch2, adsrPW2, adsrPitch3, adsrPW3);
 
   noInterrupts();
 
@@ -49,7 +73,7 @@ void setup() {
 
   delay(1500);
 
-  voice->init();
+  voice1->init();
 
 //   voice->setSaw(true);
 //   voice->setTriangle(false);
@@ -88,7 +112,9 @@ void loop() {
 
   lastTime = currentTime + microPeriod - difference;
 
-  voice->process();
+  voice1->process();
+  voice2->process();
+  voice3->process();
 }
 
 void initInterrupts(bool initModulationInterrupt) {
@@ -166,7 +192,9 @@ ISR(TIMER0_COMPA_vect)
       midiHandler->handleMidiMessage(rx);
   }
 
-  voice->process();
+  voice1->process();
+  voice2->process();
+  voice3->process();
 
   timerCounter++;
 

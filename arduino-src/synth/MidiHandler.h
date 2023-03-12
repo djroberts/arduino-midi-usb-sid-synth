@@ -6,12 +6,40 @@
 
 class MidiHandler {
   public:
-    MidiHandler(SidVoice *voice1, LFO *lfoPitch1, LFO *lfoPW1, ADSR *adsrPitch1, ADSR *adsrPW1) {
+    MidiHandler(
+      SidVoice *voice1,
+      SidVoice *voice2,
+      SidVoice *voice3,
+      LFO *lfoPitch1,
+      LFO *lfoPW1,
+      LFO *lfoPitch2,
+      LFO *lfoPW2,
+      LFO *lfoPitch3,
+      LFO *lfoPW3,
+      ADSR *adsrPitch1,
+      ADSR *adsrPW1,
+      ADSR *adsrPitch2,
+      ADSR *adsrPW2,
+      ADSR *adsrPitch3,
+      ADSR *adsrPW3
+    ) {
       this->voice1 = voice1;
+      this->voice2 = voice2;
+      this->voice3 = voice3;
+
       this->lfoPitch1 = lfoPitch1;
       this->lfoPW1 = lfoPW1;
+      this->lfoPitch2 = lfoPitch2;
+      this->lfoPW2 = lfoPW2;
+      this->lfoPitch3 = lfoPitch3;
+      this->lfoPW3 = lfoPW3;
+
       this->adsrPitch1 = adsrPitch1;
       this->adsrPW1 = adsrPW1;
+      this->adsrPitch2 = adsrPitch2;
+      this->adsrPW2 = adsrPW2;
+      this->adsrPitch3 = adsrPitch3;
+      this->adsrPW3 = adsrPW3;
     }
 
     void handleMidiMessage(midiEventPacket_t rx) {
@@ -30,23 +58,33 @@ class MidiHandler {
 
   private:
     SidVoice *voice1;
+    SidVoice *voice2;
+    SidVoice *voice3;
+
     LFO *lfoPitch1;
     LFO *lfoPW1;
+    LFO *lfoPitch2;
+    LFO *lfoPW2;
+    LFO *lfoPitch3;
+    LFO *lfoPW3;
+
     ADSR *adsrPitch1;
     ADSR *adsrPW1;
+    ADSR *adsrPitch2;
+    ADSR *adsrPW2;
+    ADSR *adsrPitch3;
+    ADSR *adsrPW3;
 
     byte lowByte = 0;
 
     void handleNoteOn(midiEventPacket_t rx) {
-      if (rx.byte1 - 0x90 == 1 || rx.byte1 - 0x90 == 0) {
-        this->voice1->handleNoteOn(rx.byte2);
-      }
+      SidVoice *voice = getVoice(rx.byte1);
+      voice->handleNoteOn(rx.byte2);
     }
 
     void handleNoteOff(midiEventPacket_t rx) {
-      if (rx.byte1 - 0x80 == 1 || rx.byte1 - 0x80 == 0) {
-        this->voice1->handleNoteOff(rx.byte2);
-      }
+      SidVoice *voice = getVoice(rx.byte1);
+      voice->handleNoteOff(rx.byte2);
     }
 
     void handleControlChange(midiEventPacket_t rx) {
@@ -197,60 +235,63 @@ class MidiHandler {
     }
 
     SidVoice *getVoice(byte byte1) {
-      if (byte1 % 10 == 1) {
-        return this->voice1;
+      if (byte1 % 0x10 == 1) {
+        Serial.println("VOICE1");
+        return this->voice2;
       }
 
-      if (byte1 % 10 == 2) {
-        return this->voice1;
+      if (byte1 % 0x10 == 2) {
+        Serial.println("VOICE2");
+        return this->voice3;
       }
 
+     Serial.println("VOICE0");
       return this->voice1;
     }
 
     LFO *getLFOPitch(byte byte1) {
-      if (byte1 % 10 == 1) {
-        return this->lfoPitch1;
+      if (byte1 % 0x10 == 1) {
+        return this->lfoPitch2;
       }
 
-      if (byte1 % 10 == 2) {
-        return this->lfoPitch1;
+      if (byte1 % 0x10 == 2) {
+        return this->lfoPitch3;
       }
 
       return this->lfoPitch1;
     }
 
     LFO *getLFOPW(byte byte1) {
-      if (byte1 % 10 == 1) {
-        return this->lfoPW1;
+      if (byte1 % 0x10 == 1) {
+        return this->lfoPW2;
       }
 
-      if (byte1 % 10 == 2) {
-        return this->lfoPW1;
+      if (byte1 % 0x10 == 2) {
+        return this->lfoPW3;
       }
 
       return this->lfoPW1;
     }
 
     ADSR *getADSRPW(byte byte1) {
-      if (byte1 % 10 == 1) {
-        return this->adsrPW1;
+      if (byte1 % 0x10 == 1) {
+        return this->adsrPW2;
       }
 
-      if (byte1 % 10 == 2) {
-        return this->adsrPW1;
+      if (byte1 % 0x10 == 2) {
+        return this->adsrPW3;
       }
 
         return this->adsrPW1;
     }
 
     ADSR *getADSRPitch(byte byte1) {
-      if (byte1 % 10 == 1) {
-        return this->adsrPitch1;
+      if (byte1 % 0x10 == 1) {
+        return this->adsrPitch2;
       }
 
-      if (byte1 % 10 == 2) {
-        return this->adsrPitch1;
+      if (byte1 % 0x10 == 2) {
+        return this->adsrPitch3;
       }
 
         return this->adsrPitch1;

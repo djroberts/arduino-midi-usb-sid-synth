@@ -6,19 +6,6 @@
 #include "LFO.h"
 #include "ADSR.h"
 
-#define VOICE_1_FREQ_LO 0b00000
-#define VOICE_1_FREQ_HI 0b00001
-#define VOICE_1_ATTACK_DECAY 0b00101
-#define VOICE_1_PW_LO 0b00010
-#define VOICE_1_PW_HI 0b00011
-#define VOICE_1_SUSTAIN_RELEASE 0b00110
-#define VOICE_1_CONTROL_REG 0b00100
-#define MODE_VOL 0b11000
-#define FC_LO 0b10101
-#define FC_HI 0b10110
-#define RES_FILT 0b10111
-#define MODE_VOL 0b11000
-
 class SidVoice {
   private:
     Sid *sid;
@@ -63,8 +50,6 @@ class SidVoice {
     bool pulse = false;
     bool triangle = false;
 
-    double midiFrequencyTable[127];
-
     byte getControlReg() {
        byte reg = 0;
 
@@ -77,15 +62,11 @@ class SidVoice {
     }
 
     void sendAttackDecay() {
-      if (voice == 0 || voice == 1) {
-        this->sid->set(VOICE_1_ATTACK_DECAY, attack * 16 + decay);
-      }
+      this->sid->set(SID_VOICE_ATTACK_DECAY[voice], attack * 16 + decay);
     }
 
     void sendSustainRelease() {
-      if (voice == 0 || voice == 1) {
-        this->sid->set(VOICE_1_SUSTAIN_RELEASE, sustain * 16 + release);
-      }
+     this->sid->set(SID_VOICE_SUSTAIN_RELEASE[voice], sustain * 16 + release);
     }
 
     void setFrequencyBytes(double frequency) {
@@ -100,22 +81,14 @@ class SidVoice {
       lowByte = (F + .5) - Fhi * 256;
     }
 
-    void initFrequencyTable() {
-      for (int i = 0; i <= 127; i++) {
-        midiFrequencyTable[i] = 440.0 * pow(2.0, (i - 69) / 12.0);
-      }
-    }
-
     void setFrequency() {
-      if (voice == 0 || voice == 1) {
-        if (lastFreqHighByte != highByte) {
-          this->sid->set(VOICE_1_FREQ_HI, highByte);
-        }
-
-        lastFreqHighByte = highByte;
-
-        this->sid->set(VOICE_1_FREQ_LO, lowByte);
+      if (lastFreqHighByte != highByte) {
+        this->sid->set(SID_VOICE_FREQ_HI[voice], highByte);
       }
+
+      lastFreqHighByte = highByte;
+
+      this->sid->set(SID_VOICE_FREQ_LO[voice], lowByte);
     }
 
     void setPulseWidthBytes(unsigned int pulseWidth) {
@@ -126,15 +99,13 @@ class SidVoice {
     }
 
     void sendPulseWidth() {
-      if (voice == 0 || voice == 1) {
-        this->sid->set(VOICE_1_PW_LO, lowByte);
+      this->sid->set(SID_VOICE_PW_LO[voice], lowByte);
 
-        if (highByte != lastPWHighByte) {
-          this->sid->set(VOICE_1_PW_HI, highByte & 0b00001111);
-        }
-
-        lastPWHighByte = highByte;
+      if (highByte != lastPWHighByte) {
+        this->sid->set(SID_VOICE_PW_HI[voice], highByte & 0b00001111);
       }
+
+      lastPWHighByte = highByte;
     }
 
     void changePulseWidth(unsigned int pulseWidth) {
@@ -150,8 +121,6 @@ class SidVoice {
       this->lfoPW = lfoPW;
       this->adsrPitch = adsrPitch;
       this->adsrPW = adsrPW;
-
-      initFrequencyTable();
     }
 
     void init() {
@@ -189,26 +158,18 @@ class SidVoice {
     }
 
     void setNoise(bool noise) {
-      Serial.println("NOISE");
-      Serial.println(noise);
       this->noise = noise;
     }
 
     void setPulse(bool pulse) {
-      Serial.println("PULSE");
-      Serial.println(pulse);
       this->pulse = pulse;
     }
 
     void setSaw(bool saw) {
-      Serial.println("SAW");
-      Serial.println(saw);
       this->saw = saw;
     }
 
     void setTriangle(bool triangle) {
-      Serial.println("TRIANGLE");
-      Serial.println(triangle);
       this->triangle = triangle;
     }
 
@@ -292,17 +253,13 @@ class SidVoice {
 
       //this->sid->set(MODE_VOL, 0b00001111);
 
-      if (voice == 0 || voice == 1) {
-        this->sid->set(VOICE_1_CONTROL_REG, getControlReg() + 1);
-      }
+      this->sid->set(SID_VOICE_CONTROL_REG[voice], getControlReg() + 1);
     }
 
     void noteOff() {
-      if (voice == 0 || voice == 1) {
-        this->adsrPitch->release();
-        this->adsrPW->release();
-        this->sid->set(VOICE_1_CONTROL_REG, getControlReg());
-      }
+      this->adsrPitch->release();
+      this->adsrPW->release();
+      this->sid->set(SID_VOICE_CONTROL_REG[voice], getControlReg());
     }
 
     void setLFOPitchMultiplier(double lfoPitchMultiplier) {
@@ -322,6 +279,7 @@ class SidVoice {
     }
 
     void process() {
+
       double pitchModulation = 0;
       double pwModulation = 0;
 
