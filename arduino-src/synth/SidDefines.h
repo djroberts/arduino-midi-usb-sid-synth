@@ -3,6 +3,9 @@
 
 #define getCurved(x, a) (x/(x+(1-1/a)*(x-1))) // 0.5 = straight, < 0.5 = slow start, fast end, > 0.5 = fast start, slow end
 
+#define MODULATION_INTERRUPT_ENABLED  false
+#define MODULATION_SAMPLERATE  100.0  // leave at 100 for interrupt enabled
+
 // Pin connected to ST_CP of 74HC595
 #define SD_LATCH_PIN  3
 // Pin connected to SH_CP of 74HC595
@@ -20,9 +23,6 @@
 #define MAX_RELEASE_TIME 5000.0
 #define MAX_PW_SWING 2048.0
 #define MAX_PITCH_SWING 2.0;
-
-#define MODULATION_INTERRUPT_ENABLED  false
-#define MODULATION_SAMPLERATE  100.0  // leave at 100 for interrupt enabled
 
 #define MIDI_CHANNEL_VOICE_1  0 // midi channel - 1
 #define MIDI_CHANNEL_VOICE_2  1

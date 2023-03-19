@@ -29,15 +29,21 @@ class ByteArray {
       size++;
     }
 
+    void clear() {
+      delete[] arr;
+      arr = NULL;
+      size = 0;
+    }
+
     byte get(int index) {
       return arr[index];
     }
 
-    byte getLast() {
+    int getLast() {
       if (size > 0) {
         return arr[size - 1];
       } else {
-        return 0;
+        return -1;
       }
     }
 
@@ -80,6 +86,19 @@ class ByteArray {
         delete[] arr;
         arr = new_arr;
         size--;
+      }
+    }
+
+    void sort() {
+      // perform bubble sort
+      for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - i - 1; j++) {
+          if (arr[j] > arr[j + 1]) {
+            byte temp = arr[j];
+            arr[j] = arr[j + 1];
+            arr[j + 1] = temp;
+          }
+        }
       }
     }
 };

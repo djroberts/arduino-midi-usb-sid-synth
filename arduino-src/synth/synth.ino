@@ -71,9 +71,11 @@ void setup() {
 
   interrupts();
 
-  delay(1500);
+  delay(1000);
 
   voice1->init();
+  voice2->init();
+  voice3->init();
 
 //   voice->setSaw(true);
 //   voice->setTriangle(false);
@@ -161,45 +163,45 @@ void initInterrupts(bool initModulationInterrupt) {
 
 int timerCounter = 0;
 
-ISR(TIMER0_COMPA_vect)
-{
-  if (!synthReady) {
-    return;
-  }
-
-  int midiMessagesProcessed = 0;
-
-  do {
-    rx = MidiUSB.read();
-
-    if (rx.header != 0) {
-      Serial.print("Received: ");
-      Serial.print(rx.header, HEX);
-      Serial.print("-");
-      Serial.print(rx.byte1, HEX);
-      Serial.print("-");
-      Serial.print(rx.byte2, HEX);
-      Serial.print("-");
-      Serial.println(rx.byte3, HEX);
-
-      midiHandler->handleMidiMessage(rx);
-
-      midiMessagesProcessed++;
-    }
-  } while (rx.header != 0 && midiMessagesProcessed < 10);
-
-  if (rx.header) {
-      midiHandler->handleMidiMessage(rx);
-  }
-
-  voice1->process();
-  voice2->process();
-  voice3->process();
-
-  timerCounter++;
-
-  if (timerCounter >= 100) {
-    timerCounter = 0;
-    Serial.println("S");
-  }
-}
+// ISR(TIMER0_COMPA_vect)
+// {
+//   if (!synthReady) {
+//     return;
+//   }
+//
+//   int midiMessagesProcessed = 0;
+//
+//   do {
+//     rx = MidiUSB.read();
+//
+//     if (rx.header != 0) {
+//       Serial.print("Received: ");
+//       Serial.print(rx.header, HEX);
+//       Serial.print("-");
+//       Serial.print(rx.byte1, HEX);
+//       Serial.print("-");
+//       Serial.print(rx.byte2, HEX);
+//       Serial.print("-");
+//       Serial.println(rx.byte3, HEX);
+//
+//       midiHandler->handleMidiMessage(rx);
+//
+//       midiMessagesProcessed++;
+//     }
+//   } while (rx.header != 0 && midiMessagesProcessed < 10);
+//
+//   if (rx.header) {
+//       midiHandler->handleMidiMessage(rx);
+//   }
+//
+//   voice1->process();
+//   voice2->process();
+//   voice3->process();
+//
+//   timerCounter++;
+//
+//   if (timerCounter >= 100) {
+//     timerCounter = 0;
+//     Serial.println("S");
+//   }
+// }

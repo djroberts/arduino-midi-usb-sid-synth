@@ -232,20 +232,21 @@ class MidiHandler {
         handleFine(rx);
       }
 
+      if (rx.byte2 == CC_ARP_SPEED) {
+        handleArpSpeed(rx);
+      }
+
     }
 
     SidVoice *getVoice(byte byte1) {
       if (byte1 % 0x10 == 1) {
-        Serial.println("VOICE1");
         return this->voice2;
       }
 
       if (byte1 % 0x10 == 2) {
-        Serial.println("VOICE2");
         return this->voice3;
       }
 
-     Serial.println("VOICE0");
       return this->voice1;
     }
 
@@ -491,6 +492,11 @@ class MidiHandler {
     void handleVoiceType(midiEventPacket_t rx) {
       SidVoice *voice = getVoice(rx.byte1);
       voice->setVoiceType(rx.byte3);
+    }
+
+    void handleArpSpeed(midiEventPacket_t rx) {
+      SidVoice *voice = getVoice(rx.byte1);
+      voice->setArpSpeed((rx.byte3 / 127.0));
     }
 };
 

@@ -21,6 +21,16 @@ class SidVoice {
 
     byte voice = 0; // 0 = all
 
+     byte arpIndex = 0;
+    //byte arpCounterSize = 3;
+    double arpCounterIndex =  0;
+    byte arpOctaves = 1;
+    double arpAddition = 0.5;
+    double arpDirection = 1.0;
+    double lastArpModulation = 0;
+    double noteCount = 0;
+
+
     byte voiceType = 1;
 
     double portamentoCoeff = 0;
@@ -39,6 +49,7 @@ class SidVoice {
 
     double currentVoltage = -1;
     double targetVoltage = 0;
+    double lastPitchModulation = -1;
     double octave = 0;
     double fine = 0;
 
@@ -173,6 +184,10 @@ class SidVoice {
       this->triangle = triangle;
     }
 
+    void setArpSpeed(double value) {
+      arpAddition = value;
+    }
+
     void setOctave(double octave) {
       this->octave = max(-2.0, min(2.0, octave));
     }
@@ -196,11 +211,24 @@ class SidVoice {
     }
 
     void handleNoteOn(byte midiNote) {
-      if (!notesOn.exists(midiNote)) {
-        notesOn.push(midiNote);
+      if (voiceType == 2 && noteCount == 0) {
+        notesOn.clear();
       }
 
-      if (notesOn.length() == 1 || voiceType == 0) {
+      if (!notesOn.exists(midiNote)) {
+        notesOn.push(midiNote);
+        notesOn.sort();
+        noteCount++;
+      }
+
+      if (voiceType == 2 && notesOn.length() == 1) {
+        targetVoltage = 5.0 + ((midiNote - 69.0) / 12.0);
+        currentVoltage = targetVoltage;
+        arpIndex = 0;
+        arpCounterIndex = 0;
+
+        this->sid->set(SID_VOICE_CONTROL_REG[voice], getControlReg() + 1);
+      } else if (notesOn.length() == 1 || voiceType == 0) {
         noteOn(midiNote);
       } else if (notesOn.length() > 1) {
         targetVoltage = 5.0 + ((midiNote - 69.0) / 12.0);
@@ -210,14 +238,25 @@ class SidVoice {
           changeFrequency(0);
         }
       }
+
+      Serial.println("count");
+      Serial.println(this->notesOn.length());
     }
 
     void handleNoteOff(byte midiNote) {
-      notesOn.remove(midiNote);
+      if (voiceType < 2) {
+        notesOn.remove(midiNote);
+      }
 
-      if (notesOn.length() == 0) {
+      noteCount--;
+
+      if (noteCount < 0) {
+        noteCount = 0;
+      }
+
+      if (notesOn.length() == 0 || (voiceType == 2 && noteCount == 0)) {
         noteOff();
-      } else {
+      } else if (voiceType != 2) {
         byte lastMidiNote = notesOn.getLast();
 
         if (voiceType == 0) {
@@ -251,8 +290,6 @@ class SidVoice {
       setFrequencyBytes(frequency);
       setFrequency();
 
-      //this->sid->set(MODE_VOL, 0b00001111);
-
       this->sid->set(SID_VOICE_CONTROL_REG[voice], getControlReg() + 1);
     }
 
@@ -278,24 +315,15 @@ class SidVoice {
       this->adsrPWMultiplier = adsrPWMultiplier;
     }
 
-    void process() {
-
+    void processPitch() {
       double pitchModulation = 0;
-      double pwModulation = 0;
+      double arpModulation = -1;
 
-      double coeff = 0.95;
-
-      currentVoltage = targetVoltage + portamentoCoeff * (currentVoltage - targetVoltage);
+      double newVoltage = targetVoltage + portamentoCoeff * (currentVoltage - targetVoltage);
 
       if (lfoPitchMultiplier != 0) {
         lfoPitch->process();
         pitchModulation = lfoPitchMultiplier * lfoPitch->getOutput() * MAX_PITCH_SWING;
-      }
-
-      if (lfoPWMultiplier != 0) {
-        lfoPW->process();
-
-        pwModulation = lfoPWMultiplier * lfoPW->getOutput() * MAX_PW_SWING;
       }
 
       if (adsrPitchMultiplier != 0) {
@@ -304,19 +332,63 @@ class SidVoice {
         pitchModulation += adsrPitchMultiplier * adsrPitch->getOutput() * MAX_PITCH_SWING;
       }
 
+      bool newArp = false;
+
+      if (voiceType == 2 && notesOn.length() > 1) {
+        arpCounterIndex += arpAddition;
+
+        if (arpCounterIndex >= 1.0) {
+          arpCounterIndex -= 1.0;
+
+          arpIndex++;
+
+          if (arpIndex >= notesOn.length()) {
+            arpIndex = 0;
+          }
+
+          byte midiNote = notesOn.get(arpIndex);
+
+          double arpVoltage = 5.0 + ((midiNote - 69.0) / 12.0);
+
+          arpModulation = arpVoltage - targetVoltage;
+
+          newArp = true;
+        }
+      }
+
+      if (lastPitchModulation != pitchModulation || newArp || newVoltage != currentVoltage) {
+        lastArpModulation = arpModulation;
+        changeFrequency(pitchModulation + lastArpModulation);
+      }
+
+      currentVoltage = newVoltage;
+      lastPitchModulation = pitchModulation;
+    }
+
+
+    void process() {
+      this->processPitch();
+
+      double pwModulation = 0;
+
+      if (lfoPWMultiplier != 0) {
+        lfoPW->process();
+
+        pwModulation = lfoPWMultiplier * lfoPW->getOutput() * MAX_PW_SWING;
+      }
+
       if (adsrPWMultiplier != 0) {
         adsrPW->process();
 
         pwModulation += adsrPWMultiplier * adsrPW->getOutput() * MAX_PW_SWING;
       }
 
-      if (pitchModulation != 0 || portamentoCoeff > 0) {
-        changeFrequency(pitchModulation);
-      }
 
       if (pwModulation != 0) {
         changePulseWidth(pwModulation);
       }
+
+
     }
 
     void setVoiceType(byte voiceType) {
